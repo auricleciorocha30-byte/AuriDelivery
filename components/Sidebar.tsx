@@ -6,7 +6,7 @@ interface SidebarProps {
   setActiveTab: (tab: string) => void;
   onLogout: () => void;
   pendingCount: number;
-  adminName: string;
+  adminName: string; // Agora recebe o e-mail
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onLogout, pendingCount, adminName }) => {
@@ -20,6 +20,10 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onLogout, pe
     { id: 'settings', icon: 'fa-gear', label: 'Configurações' },
   ];
 
+  const getInitials = (name: string) => {
+    return name.charAt(0).toUpperCase();
+  };
+
   return (
     <div className="w-64 bg-indigo-900 text-white min-h-screen p-4 flex flex-col hidden md:flex">
       <div className="flex items-center gap-2 mb-8 px-2">
@@ -31,12 +35,12 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onLogout, pe
 
       <div className="bg-indigo-800/50 rounded-2xl p-4 mb-6 border border-white/5">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center border border-indigo-400 font-bold text-xs">
-            {adminName.substring(0, 2).toUpperCase()}
+          <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center border border-indigo-400 font-black text-xs">
+            {getInitials(adminName)}
           </div>
           <div className="overflow-hidden">
-            <p className="text-[10px] text-indigo-300 font-black uppercase tracking-widest">Administrador</p>
-            <p className="text-sm font-bold truncate">{adminName}</p>
+            <p className="text-[10px] text-indigo-300 font-black uppercase tracking-widest">Acesso Gestor</p>
+            <p className="text-[11px] font-bold truncate text-indigo-50" title={adminName}>{adminName}</p>
           </div>
         </div>
       </div>
@@ -69,17 +73,17 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onLogout, pe
         <div className="p-4 bg-indigo-800 rounded-xl">
           <div className="flex items-center gap-2 mb-2">
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-            <p className="text-[10px] text-indigo-300 uppercase font-bold tracking-wider">Sistema Online</p>
+            <p className="text-[10px] text-indigo-300 uppercase font-bold tracking-wider">Servidores Online</p>
           </div>
-          <p className="text-xs text-white/80 leading-tight italic">Painel de Controle</p>
+          <p className="text-xs text-white/80 leading-tight italic">Terminal Master</p>
         </div>
 
         <button 
           onClick={onLogout}
           className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors font-bold text-sm"
         >
-          <i className="fa-solid fa-right-from-bracket w-5"></i>
-          Encerrar Sessão
+          <i className="fa-solid fa-power-off w-5"></i>
+          Sair do Painel
         </button>
       </div>
     </div>

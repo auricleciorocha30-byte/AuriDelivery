@@ -8,24 +8,24 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 /**
  * Registra um evento de login no Supabase para auditoria.
- * Assume a existência de uma tabela 'admin_logins' ou similar.
- * Caso a tabela não exista, o erro será capturado silenciosamente para não travar o app.
+ * Agora utiliza o e-mail como identificador principal.
  */
-export const saveAdminLogin = async (username: string) => {
+export const saveAdminLogin = async (email: string) => {
   try {
     const { error } = await supabase
       .from('admin_logins')
       .insert([
         { 
-          username, 
+          email: email, // Alterado de username para email
           logged_at: new Date().toISOString(),
-          app_context: 'AuriDelivery Manager'
+          app_context: 'AuriDelivery Manager Panel',
+          device_info: navigator.userAgent
         }
       ]);
     
-    if (error) console.warn('Supabase: Erro ao registrar login (tabela pode não existir):', error.message);
-    else console.log('Supabase: Login registrado com sucesso para', username);
+    if (error) console.warn('Supabase Log Warning (Email registration):', error.message);
+    else console.log('Supabase: Acesso administrativo registrado via e-mail:', email);
   } catch (e) {
-    console.error('Supabase: Falha crítica na conexão:', e);
+    console.error('Supabase Connectivity Failure:', e);
   }
 };

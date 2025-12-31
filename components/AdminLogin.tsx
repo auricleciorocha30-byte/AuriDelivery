@@ -3,42 +3,53 @@ import React, { useState } from 'react';
 import { saveAdminLogin } from '../services/supabaseService';
 
 interface AdminLoginProps {
-  onLoginSuccess: (username: string) => void;
+  onLoginSuccess: (email: string) => void;
   onBack: () => void;
 }
 
 const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onBack }) => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'done'>('idle');
+
+  const validateEmail = (email: string) => {
+    return String(email)
+      .toLowerCase()
+      .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      );
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
+    // Validação de formato de e-mail
+    if (!validateEmail(email)) {
+      setError('Por favor, insira um endereço de e-mail válido.');
+      setLoading(false);
+      return;
+    }
+
     // Regra de validação local (Senha mock '123')
-    if (password === '123' && username.trim().length > 2) {
+    if (password === '123') {
       setSyncStatus('syncing');
       
-      // Salva o login no Supabase (Persistência externa)
-      await saveAdminLogin(username);
+      // Salva o login no Supabase (Persistência externa com o E-mail)
+      await saveAdminLogin(email);
       
       setSyncStatus('done');
       
       // Simulação de delay para feedback visual de sincronização
       setTimeout(() => {
-        onLoginSuccess(username);
+        onLoginSuccess(email);
       }, 500);
     } else {
       setTimeout(() => {
-        if (username.trim().length <= 2) {
-          setError('O nome de usuário deve ter pelo menos 3 caracteres.');
-        } else {
-          setError('Senha administrativa incorreta. Tente novamente.');
-        }
+        setError('Senha administrativa incorreta. Tente novamente.');
         setLoading(false);
         setSyncStatus('idle');
       }, 600);
@@ -56,11 +67,11 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onBack }) => {
           <div className="p-8 md:p-12">
             <div className="flex flex-col items-center mb-10">
               <div className="w-20 h-20 bg-indigo-600 rounded-3xl flex items-center justify-center mb-6 shadow-xl shadow-indigo-200">
-                <i className="fa-solid fa-shield-halved text-white text-3xl"></i>
+                <i className="fa-solid fa-user-shield text-white text-3xl"></i>
               </div>
               <h2 className="text-3xl font-black text-slate-900 tracking-tight">Painel Gestor</h2>
               <p className="text-slate-500 font-medium text-sm mt-2 text-center">
-                Acesso restrito conectado ao Supabase Cloud.
+                Identifique-se com seu e-mail administrativo.
               </p>
             </div>
 
@@ -73,29 +84,29 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onBack }) => {
               )}
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Identificação de Usuário</label>
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">E-mail de Acesso</label>
                 <div className="relative">
-                  <i className="fa-solid fa-user absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                  <i className="fa-solid fa-envelope absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
                   <input 
-                    type="text" 
+                    type="email" 
                     required
                     autoFocus
-                    placeholder="Seu nome de usuário"
+                    placeholder="gestor@auridelivery.com"
                     className="w-full pl-14 pr-5 py-4 bg-slate-50 border-2 border-transparent rounded-2xl outline-none focus:border-indigo-500 focus:bg-white font-bold transition-all"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Senha de Acesso</label>
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Senha Master</label>
                 <div className="relative">
                   <i className="fa-solid fa-lock absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
                   <input 
                     type="password" 
                     required
-                    placeholder="Sua senha master"
+                    placeholder="••••••••"
                     className="w-full pl-14 pr-5 py-4 bg-slate-50 border-2 border-transparent rounded-2xl outline-none focus:border-indigo-500 focus:bg-white font-bold transition-all"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -115,7 +126,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onBack }) => {
                 ) : (
                   <i className="fa-solid fa-right-to-bracket"></i>
                 )}
-                {syncStatus === 'syncing' ? 'Sincronizando...' : loading ? 'Autenticando...' : 'Entrar no Sistema'}
+                {syncStatus === 'syncing' ? 'Verificando...' : loading ? 'Autenticando...' : 'Entrar no Sistema'}
               </button>
             </form>
 
@@ -129,16 +140,10 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onBack }) => {
               </button>
               
               <div className="flex items-center gap-2 px-3 py-1 bg-slate-50 rounded-full border border-slate-100">
-                 <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
-                 <span className="text-[8px] font-black text-slate-400 uppercase">Supabase Cloud Connected</span>
+                 <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></div>
+                 <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">Conexão Segura Ativa</span>
               </div>
             </div>
-          </div>
-          
-          <div className="bg-slate-50 p-6 text-center border-t border-slate-100">
-             <p className="text-[10px] font-bold text-slate-300 uppercase tracking-tighter">
-                Tecnologia AuriDelivery &copy; 2024 - Todos os direitos reservados
-             </p>
           </div>
         </div>
       </div>
