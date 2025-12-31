@@ -2,7 +2,7 @@
 import React from 'react';
 
 interface LandingPageProps {
-  onSelectMode: (mode: 'admin-login' | 'admin-register' | 'driver-login' | 'driver-register') => void;
+  onSelectMode: (mode: 'admin' | 'driver-login' | 'driver-register') => void;
 }
 
 const LandingPage: React.FC<LandingPageProps> = ({ onSelectMode }) => {
@@ -37,20 +37,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSelectMode }) => {
             <p className="text-indigo-300 text-sm leading-relaxed mb-10 flex-1">
               Administre frotas, monitore entregas em tempo real, gerencie pagamentos e visualize métricas de desempenho da sua unidade.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <button 
-                onClick={() => onSelectMode('admin-login')}
-                className="w-full bg-white text-indigo-900 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-yellow-400 transition-colors shadow-xl"
-              >
-                Acessar Gestão
-              </button>
-              <button 
-                onClick={() => onSelectMode('admin-register')}
-                className="w-full bg-indigo-500/30 text-white border border-indigo-400/30 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-500/50 transition-colors"
-              >
-                Criar Conta
-              </button>
-            </div>
+            <button 
+              onClick={() => onSelectMode('admin')}
+              className="w-full bg-white text-indigo-900 py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-yellow-400 transition-colors shadow-xl"
+            >
+              Acessar Gestão
+            </button>
           </div>
 
           {/* Card Driver */}

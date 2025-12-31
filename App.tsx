@@ -1,21 +1,20 @@
 
 import React, { useState } from 'react';
-import Sidebar from './components/Sidebar.tsx';
-import Dashboard from './components/Dashboard.tsx';
-import RegistrationForm from './components/RegistrationForm.tsx';
-import DriverList from './components/DriverList.tsx';
-import DriverApproval from './components/DriverApproval.tsx';
-import Deliveries from './components/Deliveries.tsx';
-import TrackingView from './components/TrackingView.tsx';
-import DeliveryForm from './components/DeliveryForm.tsx';
-import SettingsView from './components/SettingsView.tsx';
-import DriverAppView from './components/DriverAppView.tsx';
-import DriverLogin from './components/DriverLogin.tsx';
-import AdminLogin from './components/AdminLogin.tsx';
-import AdminRegistration from './components/AdminRegistration.tsx';
-import DriverSelfRegistration from './components/DriverSelfRegistration.tsx';
-import LandingPage from './components/LandingPage.tsx';
-import { Driver, VehicleType, DriverStatus, Delivery, StoreConfig } from './types.ts';
+import Sidebar from './components/Sidebar';
+import Dashboard from './components/Dashboard';
+import RegistrationForm from './components/RegistrationForm';
+import DriverList from './components/DriverList';
+import DriverApproval from './components/DriverApproval';
+import Deliveries from './components/Deliveries';
+import TrackingView from './components/TrackingView';
+import DeliveryForm from './components/DeliveryForm';
+import SettingsView from './components/SettingsView';
+import DriverAppView from './components/DriverAppView';
+import DriverLogin from './components/DriverLogin';
+import AdminLogin from './components/AdminLogin';
+import DriverSelfRegistration from './components/DriverSelfRegistration';
+import LandingPage from './components/LandingPage';
+import { Driver, VehicleType, DriverStatus, Delivery, StoreConfig } from './types';
 
 const MOCK_DRIVERS: Driver[] = [
   {
@@ -30,6 +29,32 @@ const MOCK_DRIVERS: Driver[] = [
     totalDeliveries: 452,
     joinedAt: '2023-01-15',
     bio: 'Experiente com frotas rápidas.'
+  },
+  {
+    id: '2',
+    name: 'Ana Beatriz',
+    email: 'ana@auri.com',
+    phone: '(11) 97777-6666',
+    vehicle: VehicleType.BICYCLE,
+    plate: '',
+    status: DriverStatus.ACTIVE,
+    rating: 4.9,
+    totalDeliveries: 128,
+    joinedAt: '2023-05-20',
+    bio: 'Entregas sustentáveis.'
+  },
+  {
+    id: '3',
+    name: 'Roberto Santos',
+    email: 'roberto@parceiro.com',
+    phone: '(11) 91111-2222',
+    vehicle: VehicleType.VAN,
+    plate: 'GHI-9090',
+    status: DriverStatus.PENDING,
+    rating: 5.0,
+    totalDeliveries: 0,
+    joinedAt: '2024-03-01',
+    bio: 'Possuo van própria e disponibilidade imediata para grandes volumes.'
   }
 ];
 
@@ -52,7 +77,7 @@ const DEFAULT_STORE: StoreConfig = {
 };
 
 const App: React.FC = () => {
-  const [appMode, setAppMode] = useState<'portal' | 'admin-login' | 'admin-register' | 'admin' | 'driver-login' | 'driver-app' | 'driver-register'>('portal');
+  const [appMode, setAppMode] = useState<'portal' | 'admin-login' | 'admin' | 'driver-login' | 'driver-app' | 'driver-register'>('portal');
   const [activeTab, setActiveTab] = useState('dashboard');
   const [drivers, setDrivers] = useState<Driver[]>(MOCK_DRIVERS);
   const [deliveries, setDeliveries] = useState<Delivery[]>(MOCK_DELIVERIES);
@@ -136,8 +161,8 @@ const App: React.FC = () => {
     setAppMode('driver-app');
   };
 
-  const handleAdminLogin = (email: string) => {
-    setLoggedInAdmin(email);
+  const handleAdminLogin = (username: string) => {
+    setLoggedInAdmin(username);
     setAppMode('admin');
   };
 
@@ -161,19 +186,66 @@ const App: React.FC = () => {
     }
   };
 
-  if (appMode === 'portal') return <LandingPage onSelectMode={(mode) => setAppMode(mode as any)} />;
-  if (appMode === 'admin-login') return <AdminLogin onLoginSuccess={handleAdminLogin} onBack={() => setAppMode('portal')} onGoToRegister={() => setAppMode('admin-register')} />;
-  if (appMode === 'admin-register') return <AdminRegistration onSuccess={() => setAppMode('admin-login')} onBack={() => setAppMode('admin-login')} />;
-  if (appMode === 'driver-login') return <DriverLogin drivers={drivers} onLoginSuccess={handleDriverLogin} onBack={() => setAppMode('portal')} onGoToRegister={() => setAppMode('driver-register')} />;
-  if (appMode === 'driver-register') return <DriverSelfRegistration onRegister={handleRegisterDriver} onBack={() => setAppMode('portal')} />;
-  if (appMode === 'driver-app' && loggedInDriver) return <DriverAppView currentDriver={loggedInDriver} deliveries={deliveries} onAccept={handleAcceptDelivery} onFinish={handleFinishDelivery} onLogout={handleLogout} />;
+  // Main Router
+  if (appMode === 'portal') {
+    return (
+      <LandingPage onSelectMode={(mode) => {
+        if (mode === 'admin') setAppMode('admin-login');
+        if (mode === 'driver-login') setAppMode('driver-login');
+        if (mode === 'driver-register') setAppMode('driver-register');
+      }} />
+    );
+  }
+
+  if (appMode === 'admin-login') {
+    return (
+      <AdminLogin 
+        onLoginSuccess={handleAdminLogin} 
+        onBack={() => setAppMode('portal')} 
+      />
+    );
+  }
+  
+  if (appMode === 'driver-login') return (
+    <DriverLogin 
+      drivers={drivers} 
+      onLoginSuccess={handleDriverLogin} 
+      onBack={() => setAppMode('portal')} 
+      onGoToRegister={() => setAppMode('driver-register')}
+    />
+  );
+
+  if (appMode === 'driver-register') return (
+    <DriverSelfRegistration 
+      onRegister={handleRegisterDriver} 
+      onBack={() => setAppMode('portal')} 
+    />
+  );
+
+  if (appMode === 'driver-app' && loggedInDriver) return (
+    <DriverAppView 
+      currentDriver={loggedInDriver} 
+      deliveries={deliveries} 
+      onAccept={handleAcceptDelivery}
+      onFinish={handleFinishDelivery}
+      onLogout={handleLogout}
+    />
+  );
 
   return (
     <div className="flex min-h-screen bg-gray-50 animate-in fade-in duration-500">
-      <Sidebar activeTab={activeTab === 'tracking' ? 'deliveries' : activeTab} setActiveTab={setActiveTab} onLogout={handleLogout} pendingCount={pendingCount} adminName={loggedInAdmin || 'Gestor'} />
+      <Sidebar 
+        activeTab={activeTab === 'tracking' ? 'deliveries' : activeTab} 
+        setActiveTab={setActiveTab} 
+        onLogout={handleLogout}
+        pendingCount={pendingCount}
+        adminName={loggedInAdmin || 'Gestor'}
+      />
       <main className="flex-1 p-4 md:p-8 pb-24 md:pb-8 overflow-y-auto">
         <div className="max-w-7xl mx-auto">{renderAdminContent()}</div>
       </main>
+      
+      {/* Mobile Nav Admin */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex justify-around p-3 z-50">
         <button onClick={() => setActiveTab('dashboard')} className={`flex flex-col items-center gap-1 ${activeTab === 'dashboard' ? 'text-indigo-600' : 'text-gray-400'}`}>
           <i className="fa-solid fa-chart-pie"></i>
@@ -182,7 +254,15 @@ const App: React.FC = () => {
         <button onClick={() => setActiveTab('approvals')} className={`flex flex-col items-center gap-1 relative ${activeTab === 'approvals' ? 'text-indigo-600' : 'text-gray-400'}`}>
           <i className="fa-solid fa-user-check"></i>
           <span className="text-[10px] font-bold">Aprovar</span>
-          {pendingCount > 0 && <span className="absolute -top-1 right-0 bg-yellow-400 text-indigo-900 text-[8px] font-black w-4 h-4 flex items-center justify-center rounded-full">{pendingCount}</span>}
+          {pendingCount > 0 && (
+            <span className="absolute -top-1 right-0 bg-yellow-400 text-indigo-900 text-[8px] font-black w-4 h-4 flex items-center justify-center rounded-full">
+              {pendingCount}
+            </span>
+          )}
+        </button>
+        <button onClick={() => setActiveTab('settings')} className={`flex flex-col items-center gap-1 ${activeTab === 'settings' ? 'text-indigo-600' : 'text-gray-400'}`}>
+          <i className="fa-solid fa-gear"></i>
+          <span className="text-[10px] font-bold">Ajustes</span>
         </button>
         <button onClick={handleLogout} className="flex flex-col items-center gap-1 text-gray-400">
           <i className="fa-solid fa-right-from-bracket"></i>
