@@ -66,7 +66,8 @@ const MOCK_DELIVERIES: Delivery[] = [
     status: 'shipped',
     driverId: '1',
     timestamp: new Date().toISOString(),
-    eta: '12 min'
+    eta: '12 min',
+    createdBy: 'Admin Master'
   }
 ];
 
@@ -178,8 +179,8 @@ const App: React.FC = () => {
       case 'approvals': return <DriverApproval drivers={drivers} onApprove={handleApproveDriver} onReject={handleRejectDriver} />;
       case 'register': return <RegistrationForm onRegister={handleRegisterDriver} />;
       case 'deliveries': return <Deliveries deliveries={deliveries} onTrack={handleTrackDelivery} />;
-      case 'new-delivery': return <DeliveryForm drivers={drivers} onLaunch={handleLaunchDelivery} storeConfig={storeConfig} />;
-      case 'settings': return <SettingsView config={storeConfig} onUpdate={setStoreConfig} />;
+      case 'new-delivery': return <DeliveryForm drivers={drivers} onLaunch={handleLaunchDelivery} storeConfig={storeConfig} adminName={loggedInAdmin || 'Gestor'} />;
+      case 'settings': return <SettingsView config={storeConfig} onUpdate={setStoreConfig} adminName={loggedInAdmin || 'Gestor'} onUpdateAdminName={setLoggedInAdmin} />;
       case 'tracking': return selectedDelivery ? <TrackingView delivery={selectedDelivery} storeConfig={storeConfig} onBack={() => setActiveTab('deliveries')} /> : <Dashboard />;
       default: return <Dashboard />;
     }
