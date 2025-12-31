@@ -1,13 +1,21 @@
 
 import { GoogleGenAI } from "@google/genai";
 
-// Initialize Gemini API client using the environment variable directly as per guidelines.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Acesso seguro ao process.env para evitar erros em tempo de execução no browser
+const getApiKey = () => {
+  try {
+    return typeof process !== 'undefined' ? process.env.API_KEY || "" : "";
+  } catch (e) {
+    return "";
+  }
+};
 
-/**
- * Analyzes a driver's profile bio and vehicle type using Gemini AI.
- */
+const ai = new GoogleGenAI({ apiKey: getApiKey() });
+
 export const analyzeDriverProfile = async (bio: string, vehicle: string) => {
+  const key = getApiKey();
+  if (!key) return "Análise indisponível (Chave de API não configurada).";
+
   try {
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
@@ -17,7 +25,6 @@ export const analyzeDriverProfile = async (bio: string, vehicle: string) => {
         topP: 0.95,
       },
     });
-    // Accessing .text property directly as per latest SDK guidelines.
     return response.text;
   } catch (error) {
     console.error("Gemini Error:", error);
@@ -25,16 +32,15 @@ export const analyzeDriverProfile = async (bio: string, vehicle: string) => {
   }
 };
 
-/**
- * Gets logistics advice from Auri-AI based on a manager's query.
- */
 export const getLogisticsAdvice = async (query: string) => {
+  const key = getApiKey();
+  if (!key) return "O assistente Auri-AI está em manutenção.";
+
   try {
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: `Você é o Auri-AI, o assistente logístico da AuriDelivery. Ajude o gestor com a seguinte dúvida: "${query}". Forneça insights baseados em eficiência e satisfação do cliente.`,
     });
-    // Accessing .text property directly as per latest SDK guidelines.
     return response.text;
   } catch (error) {
     console.error("Gemini Error:", error);

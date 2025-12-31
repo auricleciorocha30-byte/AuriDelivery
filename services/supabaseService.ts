@@ -19,8 +19,7 @@ export const saveAdminLogin = async (email: string) => {
           email: email,
           logged_at: new Date().toISOString(),
           app_context: 'AuriDelivery Manager Panel',
-          device_info: navigator.userAgent,
-          event_type: 'LOGIN'
+          device_info: navigator.userAgent
         }
       ]);
     
@@ -35,12 +34,11 @@ export const saveAdminLogin = async (email: string) => {
 };
 
 /**
- * Cria uma nova conta de administrador no Supabase e registra o evento.
+ * Cria uma nova conta de administrador no Supabase.
  */
 export const registerAdminAccount = async (email: string, name: string) => {
   try {
-    // 1. Salva na tabela de contas
-    const { error: accError } = await supabase
+    const { error } = await supabase
       .from('admin_accounts')
       .insert([
         { 
@@ -50,43 +48,13 @@ export const registerAdminAccount = async (email: string, name: string) => {
         }
       ]);
     
-    // 2. Registra o evento de criação no log de auditoria
-    await supabase
-      .from('admin_logins')
-      .insert([
-        { 
-          email: email,
-          logged_at: new Date().toISOString(),
-          app_context: 'AuriDelivery Manager Panel',
-          event_type: 'ACCOUNT_CREATED'
-        }
-      ]);
-
-    if (accError) {
-      console.warn('Supabase Account Error:', accError.message);
+    if (error) {
+      console.warn('Supabase: Erro ao criar conta (tabela "admin_accounts" pode ser necessária):', error.message);
       return false;
     }
     return true;
   } catch (e) {
-    console.error('Supabase Registration Failure:', e);
-    return false;
-  }
-};
-
-/**
- * Verifica se um e-mail está registrado na base de gestores.
- */
-export const checkAdminExists = async (email: string) => {
-  try {
-    const { data, error } = await supabase
-      .from('admin_accounts')
-      .select('email')
-      .eq('email', email)
-      .maybeSingle();
-
-    if (error) return false;
-    return !!data;
-  } catch (e) {
+    console.error('Supabase: Falha no registro de conta:', e);
     return false;
   }
 };
@@ -100,7 +68,7 @@ export const getAdminLogins = async () => {
       .from('admin_logins')
       .select('*')
       .order('logged_at', { ascending: false })
-      .limit(8);
+      .limit(5);
 
     if (error) {
       console.warn('Supabase: Não foi possível ler os logs:', error.message);
