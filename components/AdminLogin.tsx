@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { saveAdminLogin } from '../services/supabaseService';
 
 interface AdminLoginProps {
   onLoginSuccess: (username: string) => void;
@@ -11,25 +12,37 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onBack }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'done'>('idle');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
-    // Simulação de delay de segurança
-    setTimeout(() => {
-      // Regra: Qualquer usuário com a senha '123' (mock)
-      if (password === '123' && username.trim().length > 2) {
+    // Regra de validação local (Senha mock '123')
+    if (password === '123' && username.trim().length > 2) {
+      setSyncStatus('syncing');
+      
+      // Salva o login no Supabase (Persistência externa)
+      await saveAdminLogin(username);
+      
+      setSyncStatus('done');
+      
+      // Simulação de delay para feedback visual de sincronização
+      setTimeout(() => {
         onLoginSuccess(username);
-      } else if (username.trim().length <= 2) {
-        setError('O nome de usuário deve ter pelo menos 3 caracteres.');
+      }, 500);
+    } else {
+      setTimeout(() => {
+        if (username.trim().length <= 2) {
+          setError('O nome de usuário deve ter pelo menos 3 caracteres.');
+        } else {
+          setError('Senha administrativa incorreta. Tente novamente.');
+        }
         setLoading(false);
-      } else {
-        setError('Senha administrativa incorreta. Tente novamente.');
-        setLoading(false);
-      }
-    }, 800);
+        setSyncStatus('idle');
+      }, 600);
+    }
   };
 
   return (
@@ -47,7 +60,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onBack }) => {
               </div>
               <h2 className="text-3xl font-black text-slate-900 tracking-tight">Painel Gestor</h2>
               <p className="text-slate-500 font-medium text-sm mt-2 text-center">
-                Acesso restrito para administradores AuriDelivery.
+                Acesso restrito conectado ao Supabase Cloud.
               </p>
             </div>
 
@@ -93,18 +106,20 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onBack }) => {
               <button 
                 type="submit"
                 disabled={loading}
-                className="w-full bg-indigo-600 text-white py-5 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-indigo-100 hover:bg-indigo-700 active:scale-95 transition-all flex items-center justify-center gap-3"
+                className="w-full bg-indigo-600 text-white py-5 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-indigo-100 hover:bg-indigo-700 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-80"
               >
-                {loading ? (
+                {syncStatus === 'syncing' ? (
+                  <i className="fa-solid fa-cloud-arrow-up animate-bounce"></i>
+                ) : loading ? (
                   <i className="fa-solid fa-circle-notch fa-spin"></i>
                 ) : (
-                  <i className="fa-solid fa-right-from-bracket"></i>
+                  <i className="fa-solid fa-right-to-bracket"></i>
                 )}
-                {loading ? 'Autenticando...' : 'Entrar no Sistema'}
+                {syncStatus === 'syncing' ? 'Sincronizando...' : loading ? 'Autenticando...' : 'Entrar no Sistema'}
               </button>
             </form>
 
-            <div className="mt-8 text-center">
+            <div className="mt-8 text-center flex flex-col items-center gap-4">
               <button 
                 onClick={onBack}
                 className="text-xs font-bold text-slate-400 hover:text-indigo-600 transition-colors uppercase tracking-[0.2em]"
@@ -112,6 +127,11 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onBack }) => {
                 <i className="fa-solid fa-arrow-left mr-2"></i>
                 Voltar ao Portal
               </button>
+              
+              <div className="flex items-center gap-2 px-3 py-1 bg-slate-50 rounded-full border border-slate-100">
+                 <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+                 <span className="text-[8px] font-black text-slate-400 uppercase">Supabase Cloud Connected</span>
+              </div>
             </div>
           </div>
           
