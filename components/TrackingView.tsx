@@ -12,6 +12,8 @@ const TrackingView: React.FC<TrackingViewProps> = ({ delivery, storeConfig, onBa
   const [progress, setProgress] = useState(0);
   const [position, setPosition] = useState({ x: 20, y: 70 });
 
+  const originName = delivery.originName || storeConfig.name;
+
   // Simulate real-time movement
   useEffect(() => {
     const interval = setInterval(() => {
@@ -26,7 +28,6 @@ const TrackingView: React.FC<TrackingViewProps> = ({ delivery, storeConfig, onBa
 
   // Calculate current point on a simple curve for the visual "map"
   useEffect(() => {
-    // Simple path simulation from (20,70) to (80,30)
     const startX = 20;
     const endX = 80;
     const startY = 70;
@@ -48,19 +49,17 @@ const TrackingView: React.FC<TrackingViewProps> = ({ delivery, storeConfig, onBa
       </div>
 
       <div className="flex-1 relative bg-slate-100 rounded-3xl overflow-hidden shadow-inner border-4 border-white">
-        {/* Simple Simulated Map Grid */}
+        {/* Map Grid */}
         <div className="absolute inset-0 opacity-10" style={{ 
           backgroundImage: 'radial-gradient(#4f46e5 1px, transparent 1px)', 
           backgroundSize: '20px 20px' 
         }}></div>
         
-        {/* Simulated Roads */}
+        {/* Roads */}
         <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
           <path d="M 0,50 Q 50,20 100,50" stroke="#e2e8f0" strokeWidth="2" fill="none" />
           <path d="M 20,100 L 80,0" stroke="#e2e8f0" strokeWidth="2" fill="none" />
           <path d="M 0,30 Q 50,80 100,30" stroke="#e2e8f0" strokeWidth="2" fill="none" />
-          
-          {/* Active Delivery Path */}
           <path 
             d={`M 20,70 Q 50,${70 + Math.sin(50 * 0.1) * 5} 80,30`} 
             stroke="#4f46e5" 
@@ -70,12 +69,14 @@ const TrackingView: React.FC<TrackingViewProps> = ({ delivery, storeConfig, onBa
           />
         </svg>
 
-        {/* Origin Marker (Dinamizado) */}
+        {/* Origin Marker */}
         <div className="absolute left-[20%] bottom-[30%] -translate-x-1/2 -translate-y-1/2">
-          <div className="bg-indigo-600 p-2 rounded-full shadow-lg">
-            <i className="fa-solid fa-store text-white text-xs"></i>
+          <div className={`${delivery.originAddress !== storeConfig.address ? 'bg-amber-500' : 'bg-indigo-600'} p-2 rounded-full shadow-lg`}>
+            <i className={`fa-solid ${delivery.originAddress !== storeConfig.address ? 'fa-truck-ramp-box' : 'fa-store'} text-white text-xs`}></i>
           </div>
-          <p className="text-[10px] font-bold text-indigo-900 mt-1 whitespace-nowrap">{storeConfig.name}</p>
+          <div className="bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg mt-1 shadow-sm border border-gray-100">
+            <p className="text-[10px] font-black text-indigo-900 whitespace-nowrap uppercase tracking-tighter">{originName}</p>
+          </div>
         </div>
 
         {/* Destination Marker */}
@@ -83,10 +84,12 @@ const TrackingView: React.FC<TrackingViewProps> = ({ delivery, storeConfig, onBa
           <div className="bg-green-500 p-2 rounded-full shadow-lg animate-bounce">
             <i className="fa-solid fa-house-user text-white text-xs"></i>
           </div>
-          <p className="text-[10px] font-bold text-green-900 mt-1 whitespace-nowrap">{delivery.customerName}</p>
+          <div className="bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg mt-1 shadow-sm border border-gray-100">
+            <p className="text-[10px] font-black text-green-900 whitespace-nowrap uppercase tracking-tighter">{delivery.customerName}</p>
+          </div>
         </div>
 
-        {/* Driver Marker (The Moving Element) */}
+        {/* Driver Marker */}
         <div 
           className="absolute transition-all duration-100 ease-linear z-10"
           style={{ left: `${position.x}%`, top: `${position.y}%`, transform: 'translate(-50%, -50%)' }}
@@ -99,7 +102,7 @@ const TrackingView: React.FC<TrackingViewProps> = ({ delivery, storeConfig, onBa
           </div>
         </div>
 
-        {/* Info Card Floating */}
+        {/* Floating Card */}
         <div className="absolute bottom-6 left-6 right-6 md:left-auto md:w-80 bg-white p-5 rounded-2xl shadow-2xl border border-gray-100 z-20">
           <div className="flex items-center gap-4 mb-4">
             <div className="w-14 h-14 rounded-2xl bg-indigo-100 flex items-center justify-center overflow-hidden">
@@ -125,11 +128,6 @@ const TrackingView: React.FC<TrackingViewProps> = ({ delivery, storeConfig, onBa
               <p className="text-lg font-bold text-gray-700">1.2 km</p>
             </div>
           </div>
-
-          <button className="w-full mt-4 bg-gray-900 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-black transition-colors">
-            <i className="fa-solid fa-comment-dots"></i>
-            Enviar Mensagem
-          </button>
         </div>
       </div>
     </div>

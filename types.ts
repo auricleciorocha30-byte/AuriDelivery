@@ -42,6 +42,8 @@ export interface Delivery {
   id: string;
   customerName: string;
   address: string;
+  originName?: string;
+  originAddress?: string;
   status: 'pending' | 'shipped' | 'delivered';
   driverId?: string;
   timestamp: string;
