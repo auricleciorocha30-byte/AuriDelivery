@@ -5,12 +5,14 @@ interface SidebarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   onLogout: () => void;
+  pendingCount: number;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onLogout }) => {
+const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onLogout, pendingCount }) => {
   const menuItems = [
     { id: 'dashboard', icon: 'fa-chart-pie', label: 'Dashboard' },
     { id: 'drivers', icon: 'fa-users', label: 'Entregadores' },
+    { id: 'approvals', icon: 'fa-user-check', label: 'Aprovações', badge: pendingCount },
     { id: 'register', icon: 'fa-user-plus', label: 'Cadastrar Entregador' },
     { id: 'deliveries', icon: 'fa-box', label: 'Lista de Entregas' },
     { id: 'new-delivery', icon: 'fa-truck-ramp-box', label: 'Lançar Entrega' },
@@ -30,14 +32,21 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onLogout }) 
           <button
             key={item.id}
             onClick={() => setActiveTab(item.id)}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+            className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors ${
               activeTab === item.id 
                 ? 'bg-indigo-700 text-white shadow-lg' 
                 : 'text-indigo-300 hover:bg-indigo-800 hover:text-white'
             }`}
           >
-            <i className={`fa-solid ${item.icon} w-5`}></i>
-            <span className="font-medium text-sm">{item.label}</span>
+            <div className="flex items-center gap-3">
+              <i className={`fa-solid ${item.icon} w-5`}></i>
+              <span className="font-medium text-sm">{item.label}</span>
+            </div>
+            {item.badge !== undefined && item.badge > 0 && (
+              <span className="bg-yellow-400 text-indigo-900 text-[10px] font-black px-2 py-0.5 rounded-full">
+                {item.badge}
+              </span>
+            )}
           </button>
         ))}
       </nav>

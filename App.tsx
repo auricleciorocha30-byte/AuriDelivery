@@ -4,6 +4,7 @@ import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import RegistrationForm from './components/RegistrationForm';
 import DriverList from './components/DriverList';
+import DriverApproval from './components/DriverApproval';
 import Deliveries from './components/Deliveries';
 import TrackingView from './components/TrackingView';
 import DeliveryForm from './components/DeliveryForm';
@@ -40,6 +41,19 @@ const MOCK_DRIVERS: Driver[] = [
     totalDeliveries: 128,
     joinedAt: '2023-05-20',
     bio: 'Entregas sustentáveis.'
+  },
+  {
+    id: '3',
+    name: 'Roberto Santos',
+    email: 'roberto@parceiro.com',
+    phone: '(11) 91111-2222',
+    vehicle: VehicleType.VAN,
+    plate: 'GHI-9090',
+    status: DriverStatus.PENDING,
+    rating: 5.0,
+    totalDeliveries: 0,
+    joinedAt: '2024-03-01',
+    bio: 'Possuo van própria e disponibilidade imediata para grandes volumes.'
   }
 ];
 
@@ -63,12 +77,26 @@ const App: React.FC = () => {
   const [selectedDelivery, setSelectedDelivery] = useState<Delivery | null>(null);
   const [loggedInDriver, setLoggedInDriver] = useState<Driver | null>(null);
 
+  const pendingCount = drivers.filter(d => d.status === DriverStatus.PENDING).length;
+
   const handleRegisterDriver = (newDriver: Driver) => {
     setDrivers(prev => [newDriver, ...prev]);
     if (appMode === 'driver-register') {
       alert('Cadastro realizado com sucesso! Nossa equipe analisará seus dados em breve.');
       setAppMode('driver-login');
     }
+  };
+
+  const handleApproveDriver = (id: string) => {
+    setDrivers(prev => prev.map(d => 
+      d.id === id ? { ...d, status: DriverStatus.ACTIVE } : d
+    ));
+  };
+
+  const handleRejectDriver = (id: string) => {
+    setDrivers(prev => prev.map(d => 
+      d.id === id ? { ...d, status: DriverStatus.INACTIVE } : d
+    ));
   };
 
   const handleLaunchDelivery = (newDelivery: Delivery) => {
@@ -133,6 +161,7 @@ const App: React.FC = () => {
     switch (activeTab) {
       case 'dashboard': return <Dashboard />;
       case 'drivers': return <DriverList drivers={drivers} />;
+      case 'approvals': return <DriverApproval drivers={drivers} onApprove={handleApproveDriver} onReject={handleRejectDriver} />;
       case 'register': return <RegistrationForm onRegister={handleRegisterDriver} />;
       case 'deliveries': return <Deliveries deliveries={deliveries} onTrack={handleTrackDelivery} />;
       case 'new-delivery': return <DeliveryForm drivers={drivers} onLaunch={handleLaunchDelivery} />;
@@ -192,7 +221,8 @@ const App: React.FC = () => {
       <Sidebar 
         activeTab={activeTab === 'tracking' ? 'deliveries' : activeTab} 
         setActiveTab={setActiveTab} 
-        onLogout={() => setAppMode('portal')} 
+        onLogout={() => setAppMode('portal')}
+        pendingCount={pendingCount}
       />
       <main className="flex-1 p-4 md:p-8 pb-24 md:pb-8 overflow-y-auto">
         <div className="max-w-7xl mx-auto">{renderAdminContent()}</div>
@@ -203,6 +233,15 @@ const App: React.FC = () => {
         <button onClick={() => setActiveTab('dashboard')} className={`flex flex-col items-center gap-1 ${activeTab === 'dashboard' ? 'text-indigo-600' : 'text-gray-400'}`}>
           <i className="fa-solid fa-chart-pie"></i>
           <span className="text-[10px] font-bold">Início</span>
+        </button>
+        <button onClick={() => setActiveTab('approvals')} className={`flex flex-col items-center gap-1 relative ${activeTab === 'approvals' ? 'text-indigo-600' : 'text-gray-400'}`}>
+          <i className="fa-solid fa-user-check"></i>
+          <span className="text-[10px] font-bold">Aprovar</span>
+          {pendingCount > 0 && (
+            <span className="absolute -top-1 right-0 bg-yellow-400 text-indigo-900 text-[8px] font-black w-4 h-4 flex items-center justify-center rounded-full">
+              {pendingCount}
+            </span>
+          )}
         </button>
         <button onClick={() => setActiveTab('deliveries')} className={`flex flex-col items-center gap-1 ${['deliveries', 'tracking'].includes(activeTab) ? 'text-indigo-600' : 'text-gray-400'}`}>
           <i className="fa-solid fa-box"></i>
