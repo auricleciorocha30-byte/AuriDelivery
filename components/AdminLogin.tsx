@@ -5,9 +5,10 @@ import { saveAdminLogin } from '../services/supabaseService';
 interface AdminLoginProps {
   onLoginSuccess: (email: string) => void;
   onBack: () => void;
+  onGoToRegister: () => void;
 }
 
-const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onBack }) => {
+const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onBack, onGoToRegister }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -132,17 +133,19 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onBack }) => {
 
             <div className="mt-8 text-center flex flex-col items-center gap-4">
               <button 
+                onClick={onGoToRegister}
+                className="text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-colors uppercase tracking-[0.1em]"
+              >
+                Não tem conta? Cadastre-se
+              </button>
+              
+              <button 
                 onClick={onBack}
                 className="text-xs font-bold text-slate-400 hover:text-indigo-600 transition-colors uppercase tracking-[0.2em]"
               >
                 <i className="fa-solid fa-arrow-left mr-2"></i>
                 Voltar ao Portal
               </button>
-              
-              <div className="flex items-center gap-2 px-3 py-1 bg-slate-50 rounded-full border border-slate-100">
-                 <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></div>
-                 <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">Conexão Segura Ativa</span>
-              </div>
             </div>
           </div>
         </div>

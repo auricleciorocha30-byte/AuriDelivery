@@ -34,6 +34,32 @@ export const saveAdminLogin = async (email: string) => {
 };
 
 /**
+ * Cria uma nova conta de administrador no Supabase.
+ */
+export const registerAdminAccount = async (email: string, name: string) => {
+  try {
+    const { error } = await supabase
+      .from('admin_accounts')
+      .insert([
+        { 
+          email, 
+          full_name: name,
+          created_at: new Date().toISOString()
+        }
+      ]);
+    
+    if (error) {
+      console.warn('Supabase: Erro ao criar conta (tabela "admin_accounts" pode ser necessária):', error.message);
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error('Supabase: Falha no registro de conta:', e);
+    return false;
+  }
+};
+
+/**
  * Recupera os últimos acessos administrativos para exibição no dashboard.
  */
 export const getAdminLogins = async () => {

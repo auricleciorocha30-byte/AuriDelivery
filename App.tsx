@@ -12,6 +12,7 @@ import SettingsView from './components/SettingsView';
 import DriverAppView from './components/DriverAppView';
 import DriverLogin from './components/DriverLogin';
 import AdminLogin from './components/AdminLogin';
+import AdminRegistration from './components/AdminRegistration';
 import DriverSelfRegistration from './components/DriverSelfRegistration';
 import LandingPage from './components/LandingPage';
 import { Driver, VehicleType, DriverStatus, Delivery, StoreConfig } from './types';
@@ -29,32 +30,6 @@ const MOCK_DRIVERS: Driver[] = [
     totalDeliveries: 452,
     joinedAt: '2023-01-15',
     bio: 'Experiente com frotas rápidas.'
-  },
-  {
-    id: '2',
-    name: 'Ana Beatriz',
-    email: 'ana@auri.com',
-    phone: '(11) 97777-6666',
-    vehicle: VehicleType.BICYCLE,
-    plate: '',
-    status: DriverStatus.ACTIVE,
-    rating: 4.9,
-    totalDeliveries: 128,
-    joinedAt: '2023-05-20',
-    bio: 'Entregas sustentáveis.'
-  },
-  {
-    id: '3',
-    name: 'Roberto Santos',
-    email: 'roberto@parceiro.com',
-    phone: '(11) 91111-2222',
-    vehicle: VehicleType.VAN,
-    plate: 'GHI-9090',
-    status: DriverStatus.PENDING,
-    rating: 5.0,
-    totalDeliveries: 0,
-    joinedAt: '2024-03-01',
-    bio: 'Possuo van própria e disponibilidade imediata para grandes volumes.'
   }
 ];
 
@@ -77,7 +52,7 @@ const DEFAULT_STORE: StoreConfig = {
 };
 
 const App: React.FC = () => {
-  const [appMode, setAppMode] = useState<'portal' | 'admin-login' | 'admin' | 'driver-login' | 'driver-app' | 'driver-register'>('portal');
+  const [appMode, setAppMode] = useState<'portal' | 'admin-login' | 'admin-register' | 'admin' | 'driver-login' | 'driver-app' | 'driver-register'>('portal');
   const [activeTab, setActiveTab] = useState('dashboard');
   const [drivers, setDrivers] = useState<Driver[]>(MOCK_DRIVERS);
   const [deliveries, setDeliveries] = useState<Delivery[]>(MOCK_DELIVERIES);
@@ -161,8 +136,8 @@ const App: React.FC = () => {
     setAppMode('driver-app');
   };
 
-  const handleAdminLogin = (username: string) => {
-    setLoggedInAdmin(username);
+  const handleAdminLogin = (email: string) => {
+    setLoggedInAdmin(email);
     setAppMode('admin');
   };
 
@@ -190,9 +165,7 @@ const App: React.FC = () => {
   if (appMode === 'portal') {
     return (
       <LandingPage onSelectMode={(mode) => {
-        if (mode === 'admin') setAppMode('admin-login');
-        if (mode === 'driver-login') setAppMode('driver-login');
-        if (mode === 'driver-register') setAppMode('driver-register');
+        setAppMode(mode as any);
       }} />
     );
   }
@@ -202,6 +175,16 @@ const App: React.FC = () => {
       <AdminLogin 
         onLoginSuccess={handleAdminLogin} 
         onBack={() => setAppMode('portal')} 
+        onGoToRegister={() => setAppMode('admin-register')}
+      />
+    );
+  }
+
+  if (appMode === 'admin-register') {
+    return (
+      <AdminRegistration 
+        onSuccess={() => setAppMode('admin-login')} 
+        onBack={() => setAppMode('admin-login')} 
       />
     );
   }
@@ -259,10 +242,6 @@ const App: React.FC = () => {
               {pendingCount}
             </span>
           )}
-        </button>
-        <button onClick={() => setActiveTab('settings')} className={`flex flex-col items-center gap-1 ${activeTab === 'settings' ? 'text-indigo-600' : 'text-gray-400'}`}>
-          <i className="fa-solid fa-gear"></i>
-          <span className="text-[10px] font-bold">Ajustes</span>
         </button>
         <button onClick={handleLogout} className="flex flex-col items-center gap-1 text-gray-400">
           <i className="fa-solid fa-right-from-bracket"></i>
