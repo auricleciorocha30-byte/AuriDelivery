@@ -51,5 +51,4 @@ export interface Delivery {
   destination?: Coordinates;
   eta?: string;
   isBroadcast?: boolean;
-  createdBy?: string; // Nome do gestor que criou a entrega
 }

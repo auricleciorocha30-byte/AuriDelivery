@@ -5,11 +5,10 @@ import { Delivery, Driver, DriverStatus, StoreConfig } from '../types';
 interface DeliveryFormProps {
   drivers: Driver[];
   storeConfig: StoreConfig;
-  adminName: string;
   onLaunch: (delivery: Delivery) => void;
 }
 
-const DeliveryForm: React.FC<DeliveryFormProps> = ({ drivers, storeConfig, adminName, onLaunch }) => {
+const DeliveryForm: React.FC<DeliveryFormProps> = ({ drivers, storeConfig, onLaunch }) => {
   const [formData, setFormData] = useState({
     customerName: '',
     address: '',
@@ -39,8 +38,7 @@ const DeliveryForm: React.FC<DeliveryFormProps> = ({ drivers, storeConfig, admin
       driverId: formData.driverId || undefined,
       timestamp: new Date().toISOString(),
       eta: `${Math.floor(15 + Math.random() * 30)} min`,
-      isBroadcast: isBroadcast,
-      createdBy: adminName
+      isBroadcast: isBroadcast
     };
 
     // Simulate API delay
@@ -76,20 +74,6 @@ const DeliveryForm: React.FC<DeliveryFormProps> = ({ drivers, storeConfig, admin
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Identificação do Operador */}
-          <div className="bg-slate-900 p-4 rounded-2xl flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white text-[10px] font-black">
-                {adminName.substring(0,2).toUpperCase()}
-              </div>
-              <div>
-                <p className="text-[9px] text-indigo-300 font-black uppercase tracking-widest">Operador Logístico</p>
-                <p className="text-xs text-white font-bold">{adminName}</p>
-              </div>
-            </div>
-            <i className="fa-solid fa-user-check text-indigo-400"></i>
-          </div>
-
           {/* Seção de Origem */}
           <div className="space-y-4">
             <div className="flex items-center justify-between px-1">
@@ -117,7 +101,7 @@ const DeliveryForm: React.FC<DeliveryFormProps> = ({ drivers, storeConfig, admin
             </div>
 
             {formData.originMode === 'store' ? (
-              <div className="bg-indigo-50 p-4 rounded-2xl border border-indigo-100 flex items-center gap-4">
+              <div className="bg-indigo-50 p-4 rounded-2xl border border-indigo-100 flex items-center gap-4 animate-in fade-in slide-in-from-left-2">
                 <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-indigo-600 shadow-sm">
                   <i className="fa-solid fa-warehouse"></i>
                 </div>
@@ -128,14 +112,14 @@ const DeliveryForm: React.FC<DeliveryFormProps> = ({ drivers, storeConfig, admin
                 </div>
               </div>
             ) : (
-              <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100 space-y-3">
+              <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100 space-y-3 animate-in fade-in slide-in-from-right-2">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-amber-600 shadow-sm">
                     <i className="fa-solid fa-truck-ramp-box"></i>
                   </div>
                   <div>
                     <p className="text-[10px] font-black text-amber-500 uppercase">Origem Esporádica</p>
-                    <p className="text-xs font-bold text-amber-900 leading-tight">Onde o entregador retira este pedido?</p>
+                    <p className="text-xs font-bold text-amber-900 leading-tight">Defina o endereço onde o entregador deve retirar este pedido.</p>
                   </div>
                 </div>
                 <div className="relative">
@@ -143,7 +127,7 @@ const DeliveryForm: React.FC<DeliveryFormProps> = ({ drivers, storeConfig, admin
                   <input
                     type="text"
                     required
-                    placeholder="Endereço completo da retirada"
+                    placeholder="Endereço completo da retirada esporádica"
                     className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-amber-200 bg-white focus:border-amber-500 outline-none transition-all text-sm font-medium"
                     value={formData.customOriginAddress}
                     onChange={(e) => setFormData({...formData, customOriginAddress: e.target.value})}
@@ -198,7 +182,7 @@ const DeliveryForm: React.FC<DeliveryFormProps> = ({ drivers, storeConfig, admin
                     </div>
                     <div className="text-left">
                       <p className="font-bold text-sm">Disparar para todos</p>
-                      <p className="text-[10px] opacity-70 tracking-tight">Primeiro que aceitar leva</p>
+                      <p className="text-[10px] opacity-70">O primeiro que aceitar no app leva</p>
                     </div>
                   </div>
                   {!formData.driverId && <i className="fa-solid fa-circle-check text-indigo-600 text-xl"></i>}
@@ -231,9 +215,19 @@ const DeliveryForm: React.FC<DeliveryFormProps> = ({ drivers, storeConfig, admin
             className="w-full bg-indigo-600 text-white font-bold py-5 rounded-2xl hover:bg-indigo-700 active:scale-[0.98] transition-all shadow-xl shadow-indigo-200 flex items-center justify-center gap-3 disabled:opacity-50"
           >
             {loading ? <i className="fa-solid fa-spinner fa-spin"></i> : <i className="fa-solid fa-paper-plane"></i>}
-            {loading ? 'Processando Lançamento...' : 'Lançar Entrega'}
+            {loading ? 'Processando Lançamento...' : formData.driverId ? 'Confirmar Entrega Direta' : 'Iniciar Disparo para Todos'}
           </button>
         </form>
+      </div>
+
+      <div className="bg-indigo-900 p-6 rounded-2xl flex gap-4 text-white">
+        <i className="fa-solid fa-circle-info text-yellow-400 mt-1"></i>
+        <div className="text-xs">
+          <p className="font-bold mb-1">Dica de Logística</p>
+          <p className="text-indigo-200 leading-relaxed">
+            Ao utilizar uma <strong>Origem Esporádica</strong>, o sistema calculará o trajeto do entregador partindo diretamente do novo endereço informado, garantindo previsões de chegada mais precisas para o cliente.
+          </p>
+        </div>
       </div>
     </div>
   );

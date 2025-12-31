@@ -66,8 +66,7 @@ const MOCK_DELIVERIES: Delivery[] = [
     status: 'shipped',
     driverId: '1',
     timestamp: new Date().toISOString(),
-    eta: '12 min',
-    createdBy: 'Admin Master'
+    eta: '12 min'
   }
 ];
 
@@ -84,7 +83,6 @@ const App: React.FC = () => {
   const [storeConfig, setStoreConfig] = useState<StoreConfig>(DEFAULT_STORE);
   const [selectedDelivery, setSelectedDelivery] = useState<Delivery | null>(null);
   const [loggedInDriver, setLoggedInDriver] = useState<Driver | null>(null);
-  const [loggedInAdmin, setLoggedInAdmin] = useState<string | null>(null);
 
   const pendingCount = drivers.filter(d => d.status === DriverStatus.PENDING).length;
 
@@ -161,13 +159,7 @@ const App: React.FC = () => {
     setAppMode('driver-app');
   };
 
-  const handleAdminLogin = (username: string) => {
-    setLoggedInAdmin(username);
-    setAppMode('admin');
-  };
-
-  const handleLogout = () => {
-    setLoggedInAdmin(null);
+  const handleDriverLogout = () => {
     setLoggedInDriver(null);
     setAppMode('portal');
   };
@@ -179,8 +171,8 @@ const App: React.FC = () => {
       case 'approvals': return <DriverApproval drivers={drivers} onApprove={handleApproveDriver} onReject={handleRejectDriver} />;
       case 'register': return <RegistrationForm onRegister={handleRegisterDriver} />;
       case 'deliveries': return <Deliveries deliveries={deliveries} onTrack={handleTrackDelivery} />;
-      case 'new-delivery': return <DeliveryForm drivers={drivers} onLaunch={handleLaunchDelivery} storeConfig={storeConfig} adminName={loggedInAdmin || 'Gestor'} />;
-      case 'settings': return <SettingsView config={storeConfig} onUpdate={setStoreConfig} adminName={loggedInAdmin || 'Gestor'} onUpdateAdminName={setLoggedInAdmin} />;
+      case 'new-delivery': return <DeliveryForm drivers={drivers} onLaunch={handleLaunchDelivery} storeConfig={storeConfig} />;
+      case 'settings': return <SettingsView config={storeConfig} onUpdate={setStoreConfig} />;
       case 'tracking': return selectedDelivery ? <TrackingView delivery={selectedDelivery} storeConfig={storeConfig} onBack={() => setActiveTab('deliveries')} /> : <Dashboard />;
       default: return <Dashboard />;
     }
@@ -200,7 +192,7 @@ const App: React.FC = () => {
   if (appMode === 'admin-login') {
     return (
       <AdminLogin 
-        onLoginSuccess={handleAdminLogin} 
+        onLoginSuccess={() => setAppMode('admin')} 
         onBack={() => setAppMode('portal')} 
       />
     );
@@ -228,7 +220,7 @@ const App: React.FC = () => {
       deliveries={deliveries} 
       onAccept={handleAcceptDelivery}
       onFinish={handleFinishDelivery}
-      onLogout={handleLogout}
+      onLogout={handleDriverLogout}
     />
   );
 
@@ -237,9 +229,8 @@ const App: React.FC = () => {
       <Sidebar 
         activeTab={activeTab === 'tracking' ? 'deliveries' : activeTab} 
         setActiveTab={setActiveTab} 
-        onLogout={handleLogout}
+        onLogout={() => setAppMode('portal')}
         pendingCount={pendingCount}
-        adminName={loggedInAdmin || 'Gestor'}
       />
       <main className="flex-1 p-4 md:p-8 pb-24 md:pb-8 overflow-y-auto">
         <div className="max-w-7xl mx-auto">{renderAdminContent()}</div>
@@ -264,7 +255,7 @@ const App: React.FC = () => {
           <i className="fa-solid fa-gear"></i>
           <span className="text-[10px] font-bold">Ajustes</span>
         </button>
-        <button onClick={handleLogout} className="flex flex-col items-center gap-1 text-gray-400">
+        <button onClick={() => setAppMode('portal')} className="flex flex-col items-center gap-1 text-gray-400">
           <i className="fa-solid fa-right-from-bracket"></i>
           <span className="text-[10px] font-bold">Sair</span>
         </button>
