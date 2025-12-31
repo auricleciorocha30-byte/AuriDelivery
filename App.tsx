@@ -1,21 +1,21 @@
 
 import React, { useState } from 'react';
-import Sidebar from './components/Sidebar';
-import Dashboard from './components/Dashboard';
-import RegistrationForm from './components/RegistrationForm';
-import DriverList from './components/DriverList';
-import DriverApproval from './components/DriverApproval';
-import Deliveries from './components/Deliveries';
-import TrackingView from './components/TrackingView';
-import DeliveryForm from './components/DeliveryForm';
-import SettingsView from './components/SettingsView';
-import DriverAppView from './components/DriverAppView';
-import DriverLogin from './components/DriverLogin';
-import AdminLogin from './components/AdminLogin';
-import AdminRegistration from './components/AdminRegistration';
-import DriverSelfRegistration from './components/DriverSelfRegistration';
-import LandingPage from './components/LandingPage';
-import { Driver, VehicleType, DriverStatus, Delivery, StoreConfig } from './types';
+import Sidebar from './components/Sidebar.tsx';
+import Dashboard from './components/Dashboard.tsx';
+import RegistrationForm from './components/RegistrationForm.tsx';
+import DriverList from './components/DriverList.tsx';
+import DriverApproval from './components/DriverApproval.tsx';
+import Deliveries from './components/Deliveries.tsx';
+import TrackingView from './components/TrackingView.tsx';
+import DeliveryForm from './components/DeliveryForm.tsx';
+import SettingsView from './components/SettingsView.tsx';
+import DriverAppView from './components/DriverAppView.tsx';
+import DriverLogin from './components/DriverLogin.tsx';
+import AdminLogin from './components/AdminLogin.tsx';
+import AdminRegistration from './components/AdminRegistration.tsx';
+import DriverSelfRegistration from './components/DriverSelfRegistration.tsx';
+import LandingPage from './components/LandingPage.tsx';
+import { Driver, VehicleType, DriverStatus, Delivery, StoreConfig } from './types.ts';
 
 const MOCK_DRIVERS: Driver[] = [
   {
@@ -161,74 +161,19 @@ const App: React.FC = () => {
     }
   };
 
-  // Main Router
-  if (appMode === 'portal') {
-    return (
-      <LandingPage onSelectMode={(mode) => {
-        setAppMode(mode as any);
-      }} />
-    );
-  }
-
-  if (appMode === 'admin-login') {
-    return (
-      <AdminLogin 
-        onLoginSuccess={handleAdminLogin} 
-        onBack={() => setAppMode('portal')} 
-        onGoToRegister={() => setAppMode('admin-register')}
-      />
-    );
-  }
-
-  if (appMode === 'admin-register') {
-    return (
-      <AdminRegistration 
-        onSuccess={() => setAppMode('admin-login')} 
-        onBack={() => setAppMode('admin-login')} 
-      />
-    );
-  }
-  
-  if (appMode === 'driver-login') return (
-    <DriverLogin 
-      drivers={drivers} 
-      onLoginSuccess={handleDriverLogin} 
-      onBack={() => setAppMode('portal')} 
-      onGoToRegister={() => setAppMode('driver-register')}
-    />
-  );
-
-  if (appMode === 'driver-register') return (
-    <DriverSelfRegistration 
-      onRegister={handleRegisterDriver} 
-      onBack={() => setAppMode('portal')} 
-    />
-  );
-
-  if (appMode === 'driver-app' && loggedInDriver) return (
-    <DriverAppView 
-      currentDriver={loggedInDriver} 
-      deliveries={deliveries} 
-      onAccept={handleAcceptDelivery}
-      onFinish={handleFinishDelivery}
-      onLogout={handleLogout}
-    />
-  );
+  if (appMode === 'portal') return <LandingPage onSelectMode={(mode) => setAppMode(mode as any)} />;
+  if (appMode === 'admin-login') return <AdminLogin onLoginSuccess={handleAdminLogin} onBack={() => setAppMode('portal')} onGoToRegister={() => setAppMode('admin-register')} />;
+  if (appMode === 'admin-register') return <AdminRegistration onSuccess={() => setAppMode('admin-login')} onBack={() => setAppMode('admin-login')} />;
+  if (appMode === 'driver-login') return <DriverLogin drivers={drivers} onLoginSuccess={handleDriverLogin} onBack={() => setAppMode('portal')} onGoToRegister={() => setAppMode('driver-register')} />;
+  if (appMode === 'driver-register') return <DriverSelfRegistration onRegister={handleRegisterDriver} onBack={() => setAppMode('portal')} />;
+  if (appMode === 'driver-app' && loggedInDriver) return <DriverAppView currentDriver={loggedInDriver} deliveries={deliveries} onAccept={handleAcceptDelivery} onFinish={handleFinishDelivery} onLogout={handleLogout} />;
 
   return (
     <div className="flex min-h-screen bg-gray-50 animate-in fade-in duration-500">
-      <Sidebar 
-        activeTab={activeTab === 'tracking' ? 'deliveries' : activeTab} 
-        setActiveTab={setActiveTab} 
-        onLogout={handleLogout}
-        pendingCount={pendingCount}
-        adminName={loggedInAdmin || 'Gestor'}
-      />
+      <Sidebar activeTab={activeTab === 'tracking' ? 'deliveries' : activeTab} setActiveTab={setActiveTab} onLogout={handleLogout} pendingCount={pendingCount} adminName={loggedInAdmin || 'Gestor'} />
       <main className="flex-1 p-4 md:p-8 pb-24 md:pb-8 overflow-y-auto">
         <div className="max-w-7xl mx-auto">{renderAdminContent()}</div>
       </main>
-      
-      {/* Mobile Nav Admin */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex justify-around p-3 z-50">
         <button onClick={() => setActiveTab('dashboard')} className={`flex flex-col items-center gap-1 ${activeTab === 'dashboard' ? 'text-indigo-600' : 'text-gray-400'}`}>
           <i className="fa-solid fa-chart-pie"></i>
@@ -237,11 +182,7 @@ const App: React.FC = () => {
         <button onClick={() => setActiveTab('approvals')} className={`flex flex-col items-center gap-1 relative ${activeTab === 'approvals' ? 'text-indigo-600' : 'text-gray-400'}`}>
           <i className="fa-solid fa-user-check"></i>
           <span className="text-[10px] font-bold">Aprovar</span>
-          {pendingCount > 0 && (
-            <span className="absolute -top-1 right-0 bg-yellow-400 text-indigo-900 text-[8px] font-black w-4 h-4 flex items-center justify-center rounded-full">
-              {pendingCount}
-            </span>
-          )}
+          {pendingCount > 0 && <span className="absolute -top-1 right-0 bg-yellow-400 text-indigo-900 text-[8px] font-black w-4 h-4 flex items-center justify-center rounded-full">{pendingCount}</span>}
         </button>
         <button onClick={handleLogout} className="flex flex-col items-center gap-1 text-gray-400">
           <i className="fa-solid fa-right-from-bracket"></i>
