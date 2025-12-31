@@ -16,6 +16,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onLogout, pe
     { id: 'register', icon: 'fa-user-plus', label: 'Cadastrar Entregador' },
     { id: 'deliveries', icon: 'fa-box', label: 'Lista de Entregas' },
     { id: 'new-delivery', icon: 'fa-truck-ramp-box', label: 'Lançar Entrega' },
+    { id: 'settings', icon: 'fa-gear', label: 'Configurações' },
   ];
 
   return (

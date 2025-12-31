@@ -1,13 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
-import { Delivery } from '../types';
+import { Delivery, StoreConfig } from '../types';
 
 interface TrackingViewProps {
   delivery: Delivery;
+  storeConfig: StoreConfig;
   onBack: () => void;
 }
 
-const TrackingView: React.FC<TrackingViewProps> = ({ delivery, onBack }) => {
+const TrackingView: React.FC<TrackingViewProps> = ({ delivery, storeConfig, onBack }) => {
   const [progress, setProgress] = useState(0);
   const [position, setPosition] = useState({ x: 20, y: 70 });
 
@@ -69,12 +70,12 @@ const TrackingView: React.FC<TrackingViewProps> = ({ delivery, onBack }) => {
           />
         </svg>
 
-        {/* Origin Marker */}
+        {/* Origin Marker (Dinamizado) */}
         <div className="absolute left-[20%] bottom-[30%] -translate-x-1/2 -translate-y-1/2">
           <div className="bg-indigo-600 p-2 rounded-full shadow-lg">
             <i className="fa-solid fa-store text-white text-xs"></i>
           </div>
-          <p className="text-[10px] font-bold text-indigo-900 mt-1 whitespace-nowrap">Auri Central</p>
+          <p className="text-[10px] font-bold text-indigo-900 mt-1 whitespace-nowrap">{storeConfig.name}</p>
         </div>
 
         {/* Destination Marker */}

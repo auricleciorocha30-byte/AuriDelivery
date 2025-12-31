@@ -1,13 +1,14 @@
 
 import React, { useState } from 'react';
-import { Delivery, Driver, DriverStatus } from '../types';
+import { Delivery, Driver, DriverStatus, StoreConfig } from '../types';
 
 interface DeliveryFormProps {
   drivers: Driver[];
+  storeConfig: StoreConfig;
   onLaunch: (delivery: Delivery) => void;
 }
 
-const DeliveryForm: React.FC<DeliveryFormProps> = ({ drivers, onLaunch }) => {
+const DeliveryForm: React.FC<DeliveryFormProps> = ({ drivers, storeConfig, onLaunch }) => {
   const [formData, setFormData] = useState({
     customerName: '',
     address: '',
@@ -63,6 +64,20 @@ const DeliveryForm: React.FC<DeliveryFormProps> = ({ drivers, onLaunch }) => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center gap-4">
+              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-indigo-600 shadow-sm">
+                <i className="fa-solid fa-warehouse"></i>
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-gray-400 uppercase">Origem da Entrega</p>
+                <p className="text-sm font-bold text-slate-700">{storeConfig.name}</p>
+                <p className="text-[10px] text-slate-400 truncate max-w-[250px]">{storeConfig.address}</p>
+              </div>
+              <div className="ml-auto">
+                 <span className="text-[9px] bg-indigo-100 text-indigo-600 px-2 py-1 rounded-full font-black uppercase">Fixo</span>
+              </div>
+            </div>
+
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Nome do Cliente</label>
               <input
@@ -76,7 +91,7 @@ const DeliveryForm: React.FC<DeliveryFormProps> = ({ drivers, onLaunch }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Endereço de Entrega</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Endereço de Entrega (Destino)</label>
               <div className="relative">
                 <i className="fa-solid fa-location-dot absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
                 <input
@@ -150,7 +165,7 @@ const DeliveryForm: React.FC<DeliveryFormProps> = ({ drivers, onLaunch }) => {
       <div className="bg-yellow-50 p-4 rounded-xl border border-yellow-100 flex gap-3">
         <i className="fa-solid fa-circle-info text-yellow-600 mt-1"></i>
         <p className="text-xs text-yellow-800 leading-relaxed">
-          Ao escolher <strong>"Disparar para todos"</strong>, a entrega aparecerá instantaneamente no app de todos os entregadores ativos. O sistema garante que apenas um possa aceitar.
+          As entregas são calculadas partindo de <strong>{storeConfig.address}</strong>.
         </p>
       </div>
     </div>

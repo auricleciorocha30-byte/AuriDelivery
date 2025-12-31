@@ -18,6 +18,11 @@ export interface Coordinates {
   lng: number;
 }
 
+export interface StoreConfig {
+  name: string;
+  address: string;
+}
+
 export interface Driver {
   id: string;
   name: string;

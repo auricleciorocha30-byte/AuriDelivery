@@ -8,12 +8,13 @@ import DriverApproval from './components/DriverApproval';
 import Deliveries from './components/Deliveries';
 import TrackingView from './components/TrackingView';
 import DeliveryForm from './components/DeliveryForm';
+import SettingsView from './components/SettingsView';
 import DriverAppView from './components/DriverAppView';
 import DriverLogin from './components/DriverLogin';
 import AdminLogin from './components/AdminLogin';
 import DriverSelfRegistration from './components/DriverSelfRegistration';
 import LandingPage from './components/LandingPage';
-import { Driver, VehicleType, DriverStatus, Delivery } from './types';
+import { Driver, VehicleType, DriverStatus, Delivery, StoreConfig } from './types';
 
 const MOCK_DRIVERS: Driver[] = [
   {
@@ -69,11 +70,17 @@ const MOCK_DELIVERIES: Delivery[] = [
   }
 ];
 
+const DEFAULT_STORE: StoreConfig = {
+  name: 'Auri Central Matriz',
+  address: 'Rua das Flores, 123 - Centro, São Paulo - SP'
+};
+
 const App: React.FC = () => {
   const [appMode, setAppMode] = useState<'portal' | 'admin-login' | 'admin' | 'driver-login' | 'driver-app' | 'driver-register'>('portal');
   const [activeTab, setActiveTab] = useState('dashboard');
   const [drivers, setDrivers] = useState<Driver[]>(MOCK_DRIVERS);
   const [deliveries, setDeliveries] = useState<Delivery[]>(MOCK_DELIVERIES);
+  const [storeConfig, setStoreConfig] = useState<StoreConfig>(DEFAULT_STORE);
   const [selectedDelivery, setSelectedDelivery] = useState<Delivery | null>(null);
   const [loggedInDriver, setLoggedInDriver] = useState<Driver | null>(null);
 
@@ -164,8 +171,9 @@ const App: React.FC = () => {
       case 'approvals': return <DriverApproval drivers={drivers} onApprove={handleApproveDriver} onReject={handleRejectDriver} />;
       case 'register': return <RegistrationForm onRegister={handleRegisterDriver} />;
       case 'deliveries': return <Deliveries deliveries={deliveries} onTrack={handleTrackDelivery} />;
-      case 'new-delivery': return <DeliveryForm drivers={drivers} onLaunch={handleLaunchDelivery} />;
-      case 'tracking': return selectedDelivery ? <TrackingView delivery={selectedDelivery} onBack={() => setActiveTab('deliveries')} /> : <Dashboard />;
+      case 'new-delivery': return <DeliveryForm drivers={drivers} onLaunch={handleLaunchDelivery} storeConfig={storeConfig} />;
+      case 'settings': return <SettingsView config={storeConfig} onUpdate={setStoreConfig} />;
+      case 'tracking': return selectedDelivery ? <TrackingView delivery={selectedDelivery} storeConfig={storeConfig} onBack={() => setActiveTab('deliveries')} /> : <Dashboard />;
       default: return <Dashboard />;
     }
   };
@@ -243,9 +251,9 @@ const App: React.FC = () => {
             </span>
           )}
         </button>
-        <button onClick={() => setActiveTab('deliveries')} className={`flex flex-col items-center gap-1 ${['deliveries', 'tracking'].includes(activeTab) ? 'text-indigo-600' : 'text-gray-400'}`}>
-          <i className="fa-solid fa-box"></i>
-          <span className="text-[10px] font-bold">Pedidos</span>
+        <button onClick={() => setActiveTab('settings')} className={`flex flex-col items-center gap-1 ${activeTab === 'settings' ? 'text-indigo-600' : 'text-gray-400'}`}>
+          <i className="fa-solid fa-gear"></i>
+          <span className="text-[10px] font-bold">Ajustes</span>
         </button>
         <button onClick={() => setAppMode('portal')} className="flex flex-col items-center gap-1 text-gray-400">
           <i className="fa-solid fa-right-from-bracket"></i>
