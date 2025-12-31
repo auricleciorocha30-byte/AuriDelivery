@@ -1,9 +1,21 @@
 
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "" });
+// Acesso seguro ao process.env para evitar erros em tempo de execução no browser
+const getApiKey = () => {
+  try {
+    return typeof process !== 'undefined' ? process.env.API_KEY || "" : "";
+  } catch (e) {
+    return "";
+  }
+};
+
+const ai = new GoogleGenAI({ apiKey: getApiKey() });
 
 export const analyzeDriverProfile = async (bio: string, vehicle: string) => {
+  const key = getApiKey();
+  if (!key) return "Análise indisponível (Chave de API não configurada).";
+
   try {
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
@@ -21,6 +33,9 @@ export const analyzeDriverProfile = async (bio: string, vehicle: string) => {
 };
 
 export const getLogisticsAdvice = async (query: string) => {
+  const key = getApiKey();
+  if (!key) return "O assistente Auri-AI está em manutenção.";
+
   try {
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
