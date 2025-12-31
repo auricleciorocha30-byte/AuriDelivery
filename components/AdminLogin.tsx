@@ -2,11 +2,12 @@
 import React, { useState } from 'react';
 
 interface AdminLoginProps {
-  onLoginSuccess: () => void;
+  onLoginSuccess: (username: string) => void;
   onBack: () => void;
 }
 
 const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onBack }) => {
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -18,8 +19,12 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onBack }) => {
 
     // Simulação de delay de segurança
     setTimeout(() => {
-      if (password === '123') {
-        onLoginSuccess();
+      // Regra: Qualquer usuário com a senha '123' (mock)
+      if (password === '123' && username.trim().length > 2) {
+        onLoginSuccess(username);
+      } else if (username.trim().length <= 2) {
+        setError('O nome de usuário deve ter pelo menos 3 caracteres.');
+        setLoading(false);
       } else {
         setError('Senha administrativa incorreta. Tente novamente.');
         setLoading(false);
@@ -46,7 +51,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onBack }) => {
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-5">
               {error && (
                 <div className="p-4 bg-red-50 text-red-500 text-xs font-bold rounded-2xl border border-red-100 flex items-center gap-3 animate-shake">
                   <i className="fa-solid fa-circle-exclamation text-base"></i>
@@ -55,15 +60,30 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onBack }) => {
               )}
 
               <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Identificação de Usuário</label>
+                <div className="relative">
+                  <i className="fa-solid fa-user absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                  <input 
+                    type="text" 
+                    required
+                    autoFocus
+                    placeholder="Seu nome de usuário"
+                    className="w-full pl-14 pr-5 py-4 bg-slate-50 border-2 border-transparent rounded-2xl outline-none focus:border-indigo-500 focus:bg-white font-bold transition-all"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Senha de Acesso</label>
                 <div className="relative">
                   <i className="fa-solid fa-lock absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
                   <input 
                     type="password" 
                     required
-                    autoFocus
                     placeholder="Sua senha master"
-                    className="w-full pl-14 pr-5 py-4 bg-slate-50 border-2 border-transparent rounded-2xl outline-none focus:border-indigo-500 focus:bg-white font-bold text-lg transition-all"
+                    className="w-full pl-14 pr-5 py-4 bg-slate-50 border-2 border-transparent rounded-2xl outline-none focus:border-indigo-500 focus:bg-white font-bold transition-all"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
@@ -78,7 +98,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onBack }) => {
                 {loading ? (
                   <i className="fa-solid fa-circle-notch fa-spin"></i>
                 ) : (
-                  <i className="fa-solid fa-right-to-bracket"></i>
+                  <i className="fa-solid fa-right-from-bracket"></i>
                 )}
                 {loading ? 'Autenticando...' : 'Entrar no Sistema'}
               </button>

@@ -6,9 +6,10 @@ interface SidebarProps {
   setActiveTab: (tab: string) => void;
   onLogout: () => void;
   pendingCount: number;
+  adminName: string;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onLogout, pendingCount }) => {
+const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onLogout, pendingCount, adminName }) => {
   const menuItems = [
     { id: 'dashboard', icon: 'fa-chart-pie', label: 'Dashboard' },
     { id: 'drivers', icon: 'fa-users', label: 'Entregadores' },
@@ -21,11 +22,23 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onLogout, pe
 
   return (
     <div className="w-64 bg-indigo-900 text-white min-h-screen p-4 flex flex-col hidden md:flex">
-      <div className="flex items-center gap-2 mb-10 px-2">
-        <div className="bg-yellow-400 p-2 rounded-lg">
-          <i className="fa-solid fa-truck-fast text-indigo-900 text-xl"></i>
+      <div className="flex items-center gap-2 mb-8 px-2">
+        <div className="bg-yellow-400 p-2 rounded-lg text-indigo-900">
+          <i className="fa-solid fa-truck-fast text-xl"></i>
         </div>
         <span className="text-xl font-bold tracking-tight">AuriDelivery</span>
+      </div>
+
+      <div className="bg-indigo-800/50 rounded-2xl p-4 mb-6 border border-white/5">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center border border-indigo-400 font-bold text-xs">
+            {adminName.substring(0, 2).toUpperCase()}
+          </div>
+          <div className="overflow-hidden">
+            <p className="text-[10px] text-indigo-300 font-black uppercase tracking-widest">Administrador</p>
+            <p className="text-sm font-bold truncate">{adminName}</p>
+          </div>
+        </div>
       </div>
       
       <nav className="flex-1 space-y-1">
@@ -58,7 +71,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onLogout, pe
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
             <p className="text-[10px] text-indigo-300 uppercase font-bold tracking-wider">Sistema Online</p>
           </div>
-          <p className="text-xs text-white/80 leading-tight italic">Painel Admin</p>
+          <p className="text-xs text-white/80 leading-tight italic">Painel de Controle</p>
         </div>
 
         <button 
@@ -66,7 +79,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onLogout, pe
           className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors font-bold text-sm"
         >
           <i className="fa-solid fa-right-from-bracket w-5"></i>
-          Sair do Painel
+          Encerrar Sessão
         </button>
       </div>
     </div>
