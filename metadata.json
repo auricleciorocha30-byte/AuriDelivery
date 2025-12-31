@@ -1,0 +1,9 @@
+{
+  "name": "AuriDelivery Pro",
+  "description": "Plataforma completa de logística com gestão administrativa e aplicativo nativo para entregadores.",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation",
+    "microphone"
+  ]
+}
